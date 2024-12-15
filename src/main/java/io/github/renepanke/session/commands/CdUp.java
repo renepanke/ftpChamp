@@ -15,7 +15,7 @@ public class CdUp implements Command {
 
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
         LOG.atDebug().addArgument(() -> session.getWorkingDirectory().toAbsolutePath().toString())
                 .log("Current working directory: <{}>");
         Path parent = FileSystem.getParent(session.getWorkingDirectory());

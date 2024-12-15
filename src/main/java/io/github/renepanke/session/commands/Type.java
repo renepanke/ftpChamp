@@ -11,7 +11,7 @@ public class Type implements Command {
 
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
         Optional<DataTransferType> type = DataTransferType.fromTypeCodeLiteral(argument);
         if (type.isEmpty()) Reply.PermanentNegativeCompletion.send_504_CommandNotImplementedForThatParameter(session);
 

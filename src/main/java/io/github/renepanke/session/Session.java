@@ -45,7 +45,7 @@ public class Session {
         LOG.atInfo().addArgument(message).log("Sending response <{}>");
     }
 
-    public void requireAuthOr503NotLoggedIn() {
+    public void requireAuthOr530NotLoggedIn() {
         if (this.isNotAuthenticated()) {
             Reply.PermanentNegativeCompletion.send_530_NotLoggedIn(this);
         }

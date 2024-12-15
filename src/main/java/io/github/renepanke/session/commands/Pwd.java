@@ -12,7 +12,7 @@ public class Pwd implements Command {
      */
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
         session.sendResponse("257 \"" + session.getWorkingDirectory().toAbsolutePath() + "\" is the current directory");
     }
 }

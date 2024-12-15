@@ -10,6 +10,7 @@ public class CommandRegistry {
     public static final Map<String, Command> commands = new HashMap<>() {{
         put("CDUP", new CdUp());
         put("CWD", new Cwd());
+        put("DELE", new Dele());
         put("FEAT", new Feat());
         put("LIST", new List());
         put("PASS", new Pass());

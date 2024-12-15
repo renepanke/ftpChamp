@@ -22,7 +22,7 @@ public class Cwd implements Command {
      */
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
         if (argument == null) {
             LOG.error("No target directory provided in arguments, returning 501 Syntax error in parameters or arguments.");
             Reply.PermanentNegativeCompletion.send_501_SyntaxErrorInParametersOrArguments(session);

@@ -36,7 +36,7 @@ public class List implements Command {
      */
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
 
         if (session.getDataAddress() == null || session.getDataPort() == Session.UNINITIALIZED_ACTIVE_DATA_PORT) {
             LOG.debug("Need to call PASV or PORT before calling list, returning 503 Bad Sequence of Commands.");

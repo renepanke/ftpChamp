@@ -7,7 +7,7 @@ public class Pasv implements Command {
 
     @Override
     public void handle(String argument, Session session) {
-        session.requireAuthOr503NotLoggedIn();
+        session.requireAuthOr530NotLoggedIn();
 
     }
 }
