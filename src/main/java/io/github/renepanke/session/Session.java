@@ -1,5 +1,6 @@
 package io.github.renepanke.session;
 
+import io.github.renepanke.RequestHandler;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
@@ -21,14 +22,16 @@ public class Session {
     public static final String CRLF = "\r\n";
     private final Socket socket;
     private final PrintWriter out;
+    private final RequestHandler sessionSpecificRequestHandler;
     private boolean authenticated = false;
     private Path workingDirectory = Path.of(System.getProperty("user.home"));
     private DataTransferType dataTransferType = DataTransferType.IMAGE;
     private InetAddress dataAddress;
     private int dataPort = UNINITIALIZED_ACTIVE_DATA_PORT;
 
-    public Session(final Socket socket) {
+    public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.socket = socket;
+        this.sessionSpecificRequestHandler = sessionRequestHandler;
         try {
             this.out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
@@ -91,5 +94,9 @@ public class Session {
 
     public void setDataPort(int dataPort) {
         this.dataPort = dataPort;
+    }
+
+    public RequestHandler getSessionSpecificRequestHandler() {
+        return sessionSpecificRequestHandler;
     }
 }

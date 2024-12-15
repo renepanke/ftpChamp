@@ -27,7 +27,7 @@ public class RequestHandler implements Runnable {
     public void run() {
         BufferedReader in = null;
         try {
-            Session context = new Session(this.clientSocket);
+            Session context = new Session(this.clientSocket, this);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             context.sendResponse("220 Service ready for new user.");
@@ -58,6 +58,10 @@ public class RequestHandler implements Runnable {
             this.closeIn(in);
             this.closeClientSocket();
         }
+    }
+
+    public void quitSession() {
+        this.shallAcceptConnections.set(false);
     }
 
 
