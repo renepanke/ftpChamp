@@ -21,6 +21,7 @@ public class CommandRegistry {
         put("RNFR", new RNFR());
         put("RNTO", new RNTO());
         put("SMNT", new SMNT());
+        put("STOR", new STOR());
         put("SYST", new SYST());
         put("TYPE", new TYPE());
         put("USER", new USER());
