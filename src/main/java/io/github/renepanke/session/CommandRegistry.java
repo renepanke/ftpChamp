@@ -18,6 +18,7 @@ public class CommandRegistry {
         put("PORT", new PORT());
         put("PWD", new PWD());
         put("QUIT", new QUIT());
+        put("RETR", new RETR());
         put("RNFR", new RNFR());
         put("RNTO", new RNTO());
         put("SMNT", new SMNT());
