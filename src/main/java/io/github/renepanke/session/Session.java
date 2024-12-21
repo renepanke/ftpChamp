@@ -1,7 +1,9 @@
 package io.github.renepanke.session;
 
 import io.github.renepanke.RequestHandler;
+import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
+import io.github.renepanke.session.commands.ConnectionMode;
 import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -17,22 +20,26 @@ import static io.github.renepanke.lang.Bools.not;
 
 public class Session {
 
-    public static final int UNINITIALIZED_ACTIVE_DATA_PORT = -1;
+    public static final int UNINITIALIZED_PORT = -1;
 
     private static final Logger LOG = LoggerFactory.getLogger(Session.class);
     public static final String CRLF = "\r\n";
+    public static final int RANDOM_PORT = 0;
     private final Socket socket;
     private final PrintWriter out;
     private final RequestHandler sessionSpecificRequestHandler;
     private boolean authenticated = false;
     private Path workingDirectory = Path.of(System.getProperty("user.home"));
     private DataTransferType dataTransferType = DataTransferType.IMAGE;
-    private InetAddress dataAddress;
-    private int dataPort = UNINITIALIZED_ACTIVE_DATA_PORT;
+    private InetAddress activeClientDataAddress;
+    private int activeClientDataPort = UNINITIALIZED_PORT;
     private FileRenameStatus fileRenameStatus = FileRenameStatus.UNINITIALIZED;
     private Path fileRenameOldFile;
     private final FileStructure fileStructure = FileStructure.FILE;
     private TransferMode transferMode = TransferMode.STREAM;
+    private ConnectionMode connectionMode = ConnectionMode.UNINITIALIZED;
+    private ServerSocket passiveServerSocket;
+    private int passiveDataPort = UNINITIALIZED_PORT;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.socket = socket;
@@ -85,20 +92,20 @@ public class Session {
         this.dataTransferType = dataTransferType;
     }
 
-    public InetAddress getDataAddress() {
-        return dataAddress;
+    public InetAddress getActiveClientDataAddress() {
+        return activeClientDataAddress;
     }
 
-    public void setDataAddress(InetAddress dataAddress) {
-        this.dataAddress = dataAddress;
+    public void setActiveClientDataAddress(InetAddress activeClientDataAddress) {
+        this.activeClientDataAddress = activeClientDataAddress;
     }
 
-    public int getDataPort() {
-        return dataPort;
+    public int getActiveClientDataPort() {
+        return activeClientDataPort;
     }
 
-    public void setDataPort(int dataPort) {
-        this.dataPort = dataPort;
+    public void setActiveClientDataPort(int activeClientDataPort) {
+        this.activeClientDataPort = activeClientDataPort;
     }
 
     public RequestHandler getSessionSpecificRequestHandler() {
@@ -125,6 +132,14 @@ public class Session {
         this.transferMode = transferMode;
     }
 
+    public ConnectionMode getConnectionMode() {
+        return connectionMode;
+    }
+
+    public void setConnectionMode(ConnectionMode connectionMode) {
+        this.connectionMode = connectionMode;
+    }
+
     public FileRenameStatus initializeFileRename(String oldFile) {
         try {
             this.fileRenameOldFile = workingDirectory.resolve(oldFile);
@@ -143,5 +158,47 @@ public class Session {
     public void resetFileRenameStatus() {
         this.fileRenameOldFile = null;
         this.fileRenameStatus = FileRenameStatus.UNINITIALIZED;
+    }
+
+    public void openPassiveSocket() throws FTPServerException {
+        if (passiveServerSocket != null && not(passiveServerSocket.isClosed())) {
+            throw new FTPServerException("Passive server socket already open.");
+        }
+        try {
+            passiveServerSocket = new ServerSocket(RANDOM_PORT);
+            passiveDataPort = passiveServerSocket.getLocalPort();
+        } catch (IOException e) {
+            throw new FTPServerException(e);
+        }
+    }
+
+    public Socket acceptPassiveConnection() throws FTPServerException {
+        if (passiveServerSocket == null || passiveServerSocket.isClosed()) {
+            throw new FTPServerException("No passive server socket open.");
+        }
+        try {
+            return passiveServerSocket.accept();
+        } catch (IOException e) {
+            throw new FTPServerException(e);
+        }
+    }
+
+    public void closePassiveSocket() {
+        if (passiveServerSocket != null && not(passiveServerSocket.isClosed())) {
+            try {
+                passiveServerSocket.close();
+            } catch (IOException e) {
+                LOG.atWarn().setCause(e).log("Failed to close passive server socket");
+            }
+        }
+        passiveServerSocket = null;
+    }
+
+    public int getPassiveDataPort() {
+        return passiveDataPort;
+    }
+
+    public ServerSocket getPassiveServerSocket() {
+        return passiveServerSocket;
     }
 }

@@ -2,6 +2,8 @@ package io.github.renepanke.session.commands.replies;
 
 import io.github.renepanke.session.Session;
 
+import java.net.InetAddress;
+
 public class Reply {
 
     /**
@@ -93,8 +95,9 @@ public class Reply {
             session.sendResponse("226 Closing data connection.");
         }
 
-        public static void send_227_EnteringPassiveMode(Session session) {
-            session.sendResponse("227 Entering Passive Mode (h1,h2,h3,h4,p1,p2).");
+        public static void send_227_EnteringPassiveMode(Session session, InetAddress address, int port) {
+            String addressString = address.getHostAddress().replace(".", ",");
+            session.sendResponse("227 Entering Passive Mode (" + addressString + "," + (port / 256) + "," + (port % 256) + ".");
         }
 
         public static void send_230_UserLoggedInProceed(Session session) {

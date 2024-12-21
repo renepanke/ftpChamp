@@ -23,8 +23,9 @@ public class PORT implements Command {
             }
             String ip = String.join(".", parts[0], parts[1], parts[2], parts[3]);
             int port = (Integer.parseInt(parts[4]) << 8) + Integer.parseInt(parts[5]);
-            session.setDataAddress(InetAddress.getByName(ip));
-            session.setDataPort(port);
+            session.setActiveClientDataAddress(InetAddress.getByName(ip));
+            session.setActiveClientDataPort(port);
+            session.setConnectionMode(ConnectionMode.ACTIVE);
             Reply.PositiveCompletion.send_200_CommandOkay(session);
         } catch (UnknownHostException e) {
             LOG.atError().setCause(e).addArgument(argument).log("Unable to resolve IP address from <{}>");
