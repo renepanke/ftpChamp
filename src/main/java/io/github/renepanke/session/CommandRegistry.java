@@ -17,11 +17,12 @@ public class CommandRegistry {
         put("PORT", new PORT());
         put("PWD", new PWD());
         put("QUIT", new QUIT());
+        put("RNFR", new RNFR());
+        put("RNTO", new RNTO());
+        put("SMNT", new SMNT());
         put("SYST", new SYST());
         put("TYPE", new TYPE());
         put("USER", new USER());
-        put("RNFR", new RNFR());
-        put("RNTO", new RNTO());
     }};
 
     public static Command get(String command) {
