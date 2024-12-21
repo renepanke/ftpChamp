@@ -31,6 +31,7 @@ public class Session {
     private int dataPort = UNINITIALIZED_ACTIVE_DATA_PORT;
     private FileRenameStatus fileRenameStatus = FileRenameStatus.UNINITIALIZED;
     private Path fileRenameOldFile;
+    private final FileStructure fileStructure = FileStructure.FILE;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.socket = socket;
@@ -109,6 +110,10 @@ public class Session {
 
     public FileRenameStatus getFileRenameStatus() {
         return fileRenameStatus;
+    }
+
+    public FileStructure getFileStructure() {
+        return fileStructure;
     }
 
     public FileRenameStatus initializeFileRename(String oldFile) {
