@@ -15,6 +15,7 @@ public class CommandRegistry {
         put("LIST", new LIST());
         put("MODE", new MODE());
         put("PASS", new PASS());
+        put("PASV", new PASV());
         put("PORT", new PORT());
         put("PWD", new PWD());
         put("QUIT", new QUIT());

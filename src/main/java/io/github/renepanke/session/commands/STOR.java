@@ -3,6 +3,7 @@ package io.github.renepanke.session.commands;
 import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.session.Command;
 import io.github.renepanke.session.Session;
+import io.github.renepanke.session.SharedFileTransferFunctions;
 import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class STOR implements Command {
     public void handle(String argument, Session session) {
         session.requireAuthOr530NotLoggedIn();
 
-        try (Socket dataSocket = getConnectionModeMatchingSocket(session); InputStream in = dataSocket.getInputStream()) {
+        try (Socket dataSocket = SharedFileTransferFunctions.getConnectionModeMatchingSocket(session); InputStream in = dataSocket.getInputStream()) {
             Path pathToStore = session.getWorkingDirectory().resolve(argument);
             Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
             try (OutputStream out = Files.newOutputStream(pathToStore)) {
@@ -36,27 +37,6 @@ public class STOR implements Command {
         } catch (IOException | FTPServerException e) {
             LOG.atError().setCause(e).log("Failed to execute STOR command");
             Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
-        }
-    }
-
-    private Socket getConnectionModeMatchingSocket(Session session) throws FTPServerException {
-        switch (session.getConnectionMode()) {
-            case ACTIVE -> {
-                try {
-                    return new Socket(session.getActiveClientDataAddress(), session.getActiveClientDataPort());
-                } catch (IOException e) {
-                    throw new FTPServerException(e);
-                }
-            }
-            case PASSIVE -> {
-                try {
-                    return session.acceptPassiveConnection();
-                } catch (FTPServerException e) {
-                    throw new FTPServerException(e);
-                }
-            }
-            case EXTENDED_PASSIVE -> throw new FTPServerException("Extended passive mode not implemented for STOR");
-            default -> throw new FTPServerException("Unknown connection mode " + session.getConnectionMode());
         }
     }
 }

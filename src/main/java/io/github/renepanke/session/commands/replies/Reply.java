@@ -97,7 +97,7 @@ public class Reply {
 
         public static void send_227_EnteringPassiveMode(Session session, InetAddress address, int port) {
             String addressString = address.getHostAddress().replace(".", ",");
-            session.sendResponse("227 Entering Passive Mode (" + addressString + "," + (port / 256) + "," + (port % 256) + ".");
+            session.sendResponse("227 Entering Passive Mode (" + addressString + "," + (port / 256) + "," + (port % 256) + ").");
         }
 
         public static void send_230_UserLoggedInProceed(Session session) {

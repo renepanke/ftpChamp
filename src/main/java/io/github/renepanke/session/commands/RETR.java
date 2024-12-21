@@ -3,6 +3,7 @@ package io.github.renepanke.session.commands;
 import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.session.Command;
 import io.github.renepanke.session.Session;
+import io.github.renepanke.session.SharedFileTransferFunctions;
 import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class RETR implements Command {
     public void handle(String argument, Session session) {
         session.requireAuthOr530NotLoggedIn();
 
-        try (Socket dataSocket = getConnectionModeMatchingSocket(session); OutputStream out = dataSocket.getOutputStream()) {
+        try (Socket dataSocket = SharedFileTransferFunctions.getConnectionModeMatchingSocket(session); OutputStream out = dataSocket.getOutputStream()) {
             Path pathToRetrieve = session.getWorkingDirectory().resolve(argument);
             Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
             try (InputStream in = Files.newInputStream(pathToRetrieve)) {
@@ -34,28 +35,8 @@ public class RETR implements Command {
                 Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
             }
         } catch (IOException | FTPServerException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Socket getConnectionModeMatchingSocket(Session session) throws FTPServerException {
-        switch (session.getConnectionMode()) {
-            case ACTIVE -> {
-                try {
-                    return new Socket(session.getActiveClientDataAddress(), session.getActiveClientDataPort());
-                } catch (IOException e) {
-                    throw new FTPServerException(e);
-                }
-            }
-            case PASSIVE -> {
-                try {
-                    return session.acceptPassiveConnection();
-                } catch (FTPServerException e) {
-                    throw new FTPServerException(e);
-                }
-            }
-            case EXTENDED_PASSIVE -> throw new FTPServerException("Extended passive mode not implemented for STOR");
-            default -> throw new FTPServerException("Unknown connection mode " + session.getConnectionMode());
+            LOG.atError().setCause(e).log("Failed to execute RETR command");
+            Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
         }
     }
 }
