@@ -13,6 +13,7 @@ public class CommandRegistry {
         put("DELE", new DELE());
         put("FEAT", new FEAT());
         put("LIST", new LIST());
+        put("MODE", new MODE());
         put("PASS", new PASS());
         put("PORT", new PORT());
         put("PWD", new PWD());

@@ -32,6 +32,7 @@ public class Session {
     private FileRenameStatus fileRenameStatus = FileRenameStatus.UNINITIALIZED;
     private Path fileRenameOldFile;
     private final FileStructure fileStructure = FileStructure.FILE;
+    private TransferMode transferMode = TransferMode.STREAM;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.socket = socket;
@@ -114,6 +115,14 @@ public class Session {
 
     public FileStructure getFileStructure() {
         return fileStructure;
+    }
+
+    public TransferMode getTransferMode() {
+        return transferMode;
+    }
+
+    public void setTransferMode(TransferMode transferMode) {
+        this.transferMode = transferMode;
     }
 
     public FileRenameStatus initializeFileRename(String oldFile) {
