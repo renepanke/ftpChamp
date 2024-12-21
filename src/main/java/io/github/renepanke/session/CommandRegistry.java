@@ -21,6 +21,7 @@ public class CommandRegistry {
         put("PWD", new PWD());
         put("QUIT", new QUIT());
         put("RETR", new RETR());
+        put("RMD", new RMD());
         put("RNFR", new RNFR());
         put("RNTO", new RNTO());
         put("SMNT", new SMNT());
