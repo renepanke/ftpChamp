@@ -15,6 +15,7 @@ public class CommandRegistry {
         put("LIST", new LIST());
         put("MKD", new MKD());
         put("MODE", new MODE());
+        put("NOOP", new NOOP());
         put("PASS", new PASS());
         put("PASV", new PASV());
         put("PORT", new PORT());
