@@ -20,6 +20,7 @@ public class CommandRegistry {
         put("SYST", new Syst());
         put("TYPE", new Type());
         put("USER", new User());
+        put("RNFR", new RNFR());
     }};
 
     public static Command get(String command) {

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import static io.github.renepanke.lang.Bools.not;
@@ -28,6 +29,8 @@ public class Session {
     private DataTransferType dataTransferType = DataTransferType.IMAGE;
     private InetAddress dataAddress;
     private int dataPort = UNINITIALIZED_ACTIVE_DATA_PORT;
+    private FileRenameStatus fileRenameStatus = FileRenameStatus.UNINITIALIZED;
+    private Path fileRenameOldFile;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.socket = socket;
@@ -98,5 +101,20 @@ public class Session {
 
     public RequestHandler getSessionSpecificRequestHandler() {
         return sessionSpecificRequestHandler;
+    }
+
+    public FileRenameStatus initializeFileRename(String oldFile) {
+        try {
+            this.fileRenameOldFile = workingDirectory.resolve(oldFile);
+            this.fileRenameStatus = FileRenameStatus.INITIALIZED;
+            return this.fileRenameStatus;
+        } catch (InvalidPathException e) {
+            this.fileRenameStatus = FileRenameStatus.FILE_NOT_FOUND;
+            return this.fileRenameStatus;
+        } catch (Exception e) {
+            this.fileRenameStatus = FileRenameStatus.ERROR;
+            LOG.atError().setCause(e).log("Failed to initialize file rename");
+            throw new FTPServerRuntimeException(e);
+        }
     }
 }
