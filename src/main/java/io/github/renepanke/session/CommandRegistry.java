@@ -21,6 +21,7 @@ public class CommandRegistry {
         put("TYPE", new TYPE());
         put("USER", new USER());
         put("RNFR", new RNFR());
+        put("RNTO", new RNTO());
     }};
 
     public static Command get(String command) {

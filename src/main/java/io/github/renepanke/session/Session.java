@@ -103,6 +103,14 @@ public class Session {
         return sessionSpecificRequestHandler;
     }
 
+    public Path getFileRenameOldFile() {
+        return fileRenameOldFile;
+    }
+
+    public FileRenameStatus getFileRenameStatus() {
+        return fileRenameStatus;
+    }
+
     public FileRenameStatus initializeFileRename(String oldFile) {
         try {
             this.fileRenameOldFile = workingDirectory.resolve(oldFile);
@@ -116,5 +124,10 @@ public class Session {
             LOG.atError().setCause(e).log("Failed to initialize file rename");
             throw new FTPServerRuntimeException(e);
         }
+    }
+
+    public void resetFileRenameStatus() {
+        this.fileRenameOldFile = null;
+        this.fileRenameStatus = FileRenameStatus.UNINITIALIZED;
     }
 }
