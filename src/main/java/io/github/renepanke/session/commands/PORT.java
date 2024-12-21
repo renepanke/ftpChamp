@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class Port implements Command {
+public class PORT implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Port.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PORT.class);
 
     @Override
     public void handle(String argument, Session session) {

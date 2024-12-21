@@ -8,18 +8,18 @@ import java.util.Map;
 public class CommandRegistry {
 
     public static final Map<String, Command> commands = new HashMap<>() {{
-        put("CDUP", new CdUp());
-        put("CWD", new Cwd());
-        put("DELE", new Dele());
-        put("FEAT", new Feat());
-        put("LIST", new List());
-        put("PASS", new Pass());
-        put("PORT", new Port());
-        put("PWD", new Pwd());
-        put("QUIT", new Quit());
-        put("SYST", new Syst());
-        put("TYPE", new Type());
-        put("USER", new User());
+        put("CDUP", new CDUP());
+        put("CWD", new CWD());
+        put("DELE", new DELE());
+        put("FEAT", new FEAT());
+        put("LIST", new LIST());
+        put("PASS", new PASS());
+        put("PORT", new PORT());
+        put("PWD", new PWD());
+        put("QUIT", new QUIT());
+        put("SYST", new SYST());
+        put("TYPE", new TYPE());
+        put("USER", new USER());
         put("RNFR", new RNFR());
     }};
 

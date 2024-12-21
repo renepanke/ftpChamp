@@ -3,7 +3,7 @@ package io.github.renepanke.session.commands;
 import io.github.renepanke.session.Command;
 import io.github.renepanke.session.Session;
 
-public class Pasv implements Command {
+public class PASV implements Command {
 
     @Override
     public void handle(String argument, Session session) {

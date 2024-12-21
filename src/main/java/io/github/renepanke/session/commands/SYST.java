@@ -6,9 +6,9 @@ import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Syst implements Command {
+public class SYST implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Syst.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SYST.class);
 
     @Override
     public void handle(String argument, Session session) {

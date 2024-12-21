@@ -3,7 +3,7 @@ package io.github.renepanke.session.commands;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.session.Command;
 
-public class User implements Command {
+public class USER implements Command {
 
     /**
      * USER &lt;SP&gt; &lt;username&gt; &lt;CRLF&gt;

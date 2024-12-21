@@ -3,7 +3,7 @@ package io.github.renepanke.session.commands;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.session.Command;
 
-public class Pwd implements Command {
+public class PWD implements Command {
 
     /**
      * Valid status codes: 257,500,501,502,421,550

@@ -4,7 +4,7 @@ import io.github.renepanke.session.Session;
 import io.github.renepanke.session.CommandRegistry;
 import io.github.renepanke.session.Command;
 
-public class Feat implements Command {
+public class FEAT implements Command {
 
     @Override
     public void handle(String argument, Session session) {

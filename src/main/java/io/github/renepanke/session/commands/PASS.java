@@ -4,7 +4,7 @@ import io.github.renepanke.session.Session;
 import io.github.renepanke.session.Command;
 import io.github.renepanke.session.commands.replies.Reply;
 
-public class Pass implements Command {
+public class PASS implements Command {
 
     /**
      * Valid status codes: 230, 202, 530, 500, 501, 503, 421, 332

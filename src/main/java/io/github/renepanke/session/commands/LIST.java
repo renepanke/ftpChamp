@@ -21,9 +21,9 @@ import java.util.stream.Stream;
 
 import static io.github.renepanke.lang.Bools.not;
 
-public class List implements Command {
+public class LIST implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(List.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LIST.class);
     public static final boolean AUTO_FLUSH = true;
 
     /**

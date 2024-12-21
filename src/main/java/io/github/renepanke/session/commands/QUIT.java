@@ -4,7 +4,7 @@ import io.github.renepanke.session.Command;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.session.commands.replies.Reply;
 
-public class Quit implements Command {
+public class QUIT implements Command {
 
     @Override
     public void handle(String argument, Session session) {

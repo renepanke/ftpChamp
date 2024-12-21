@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
-public class CdUp implements Command {
+public class CDUP implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CdUp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CDUP.class);
 
     @Override
     public void handle(String argument, Session session) {

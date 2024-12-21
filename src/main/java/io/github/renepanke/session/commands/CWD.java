@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
-public class Cwd implements Command {
+public class CWD implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Cwd.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CWD.class);
 
     /**
      * Valid status codes: 250,500,501,502,421,530,550

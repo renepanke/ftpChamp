@@ -12,9 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
-public class Dele implements Command {
+public class DELE implements Command {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Dele.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DELE.class);
 
     @Override
     public void handle(String argument, Session session) {

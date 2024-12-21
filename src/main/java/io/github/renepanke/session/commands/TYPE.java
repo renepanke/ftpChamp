@@ -7,7 +7,7 @@ import io.github.renepanke.session.commands.replies.Reply;
 
 import java.util.Optional;
 
-public class Type implements Command {
+public class TYPE implements Command {
 
     @Override
     public void handle(String argument, Session session) {
