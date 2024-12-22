@@ -39,10 +39,30 @@ public class LIST implements Command {
     public void handle(String argument, Session session) {
         session.requireAuthOr530NotLoggedIn();
 
-        if (session.getActiveClientDataAddress() == null || session.getActiveClientDataPort() == Session.UNINITIALIZED_PORT) {
-            LOG.debug("Need to call PASV or PORT before calling list, returning 503 Bad Sequence of Commands.");
-            Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
-            return;
+        switch (session.getConnectionMode()) {
+            case ACTIVE -> {
+                if (session.getActiveClientDataAddress() == null || session.getActiveClientDataPort() == Session.UNINITIALIZED_PORT) {
+                    LOG.warn("Need to call PORT before calling list when using an active connection, returning 503 Bad Sequence of Commands.");
+                    Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                    return;
+                }
+            }
+            case PASSIVE -> {
+                if (session.getPassiveServerSocket() == null || session.getPassiveDataPort() == Session.UNINITIALIZED_PORT) {
+                    LOG.warn("Need to call PASV before calling list when using a passive connection, returning 503 Bad Sequence of Commands.");
+                    Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                    return;
+                }
+            }
+            case UNINITIALIZED -> {
+                LOG.warn("Neither PASV nor PORT was called before retrieving list, returning 503 Bad Sequence of Commands.");
+                Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                return;
+            }
+            default -> {
+                Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
+                return;
+            }
         }
 
         Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
@@ -57,9 +77,12 @@ public class LIST implements Command {
     private void sendListPassive(String argument, Session session) {
         try (Socket socket = session.acceptPassiveConnection(); PrintWriter out = getPrintWriter(socket, session)) {
             sendListToPrintWriter(argument, session, out);
+            Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
         } catch (IOException | FTPServerException e) {
             LOG.atError().setCause(e).log("Can't open passive connection");
             Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
+        } finally {
+            session.closePassiveSocket();
         }
     }
 

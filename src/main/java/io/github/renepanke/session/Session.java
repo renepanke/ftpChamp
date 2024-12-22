@@ -21,6 +21,8 @@ import static io.github.renepanke.lang.Bools.not;
 public class Session {
 
     public static final int UNINITIALIZED_PORT = -1;
+    public static final int DEFAULT_PASSIVE_BACKLOG = 50;
+    public static final InetAddress DEFAULT_IP = InetAddress.getLoopbackAddress();
 
     private static final Logger LOG = LoggerFactory.getLogger(Session.class);
     public static final String CRLF = "\r\n";
@@ -165,7 +167,7 @@ public class Session {
             throw new FTPServerException("Passive server socket already open.");
         }
         try {
-            passiveServerSocket = new ServerSocket(RANDOM_PORT);
+            passiveServerSocket = new ServerSocket(RANDOM_PORT, DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
             passiveDataPort = passiveServerSocket.getLocalPort();
         } catch (IOException e) {
             throw new FTPServerException(e);
@@ -187,6 +189,8 @@ public class Session {
         if (passiveServerSocket != null && not(passiveServerSocket.isClosed())) {
             try {
                 passiveServerSocket.close();
+                LOG.atInfo().addArgument(() -> passiveServerSocket.getInetAddress().getHostAddress() + ":" + passiveServerSocket.getLocalPort())
+                        .log("Closed PASV connection at <{}>");
             } catch (IOException e) {
                 LOG.atWarn().setCause(e).log("Failed to close passive server socket");
             }

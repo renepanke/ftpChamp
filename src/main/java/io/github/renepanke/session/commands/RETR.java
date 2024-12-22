@@ -22,7 +22,6 @@ public class RETR implements Command {
     @Override
     public void handle(String argument, Session session) {
         session.requireAuthOr530NotLoggedIn();
-
         try (Socket dataSocket = SharedFileTransferFunctions.getConnectionModeMatchingSocket(session); OutputStream out = dataSocket.getOutputStream()) {
             Path pathToRetrieve = session.getWorkingDirectory().resolve(argument);
             Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
@@ -37,6 +36,8 @@ public class RETR implements Command {
         } catch (IOException | FTPServerException e) {
             LOG.atError().setCause(e).log("Failed to execute RETR command");
             Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
+        } finally {
+            session.closePassiveSocket();
         }
     }
 }

@@ -37,6 +37,8 @@ public class STOR implements Command {
         } catch (IOException | FTPServerException e) {
             LOG.atError().setCause(e).log("Failed to execute STOR command");
             Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
+        } finally {
+            session.closePassiveSocket();
         }
     }
 }
