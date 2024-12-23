@@ -1,6 +1,8 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.exceptions.FTPServerException;
+import io.github.renepanke.session.ConnectionMode;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.commands.replies.Reply;
 import org.slf4j.Logger;
@@ -8,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.Socket;
 
-import static io.github.renepanke.commands.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.auth;
 
 public class PASV implements Command {
 

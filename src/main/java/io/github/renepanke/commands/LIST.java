@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.fs.FileSystem;
 import io.github.renepanke.lang.Strings;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.github.renepanke.lang.Bools.not;
-import static io.github.renepanke.commands.Middleware.*;
+import static io.github.renepanke.commands.shared.Middleware.*;
 
 public class LIST implements Command {
 

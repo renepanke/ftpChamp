@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.fs.FileSystem;
 import io.github.renepanke.lang.Strings;
@@ -18,8 +19,8 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.renepanke.commands.Middleware.auth;
-import static io.github.renepanke.commands.Middleware.data;
+import static io.github.renepanke.commands.shared.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.data;
 
 public class NLST implements Command {
 

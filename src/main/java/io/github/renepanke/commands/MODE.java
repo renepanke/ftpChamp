@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.session.TransferMode;
@@ -9,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.Socket;
 
-import static io.github.renepanke.commands.Middleware.arg;
-import static io.github.renepanke.commands.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.arg;
+import static io.github.renepanke.commands.shared.Middleware.auth;
 
 public class MODE implements Command {
 

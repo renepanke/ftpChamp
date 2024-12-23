@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.session.DataTransferType;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.commands.replies.Reply;
@@ -7,8 +8,8 @@ import io.github.renepanke.commands.replies.Reply;
 import java.net.Socket;
 import java.util.Optional;
 
-import static io.github.renepanke.commands.Middleware.arg;
-import static io.github.renepanke.commands.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.arg;
+import static io.github.renepanke.commands.shared.Middleware.auth;
 
 public class TYPE implements Command {
 

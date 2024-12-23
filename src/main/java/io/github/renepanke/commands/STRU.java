@@ -1,13 +1,14 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.session.FileStructure;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.commands.replies.Reply;
 
 import java.net.Socket;
 
-import static io.github.renepanke.commands.Middleware.arg;
-import static io.github.renepanke.commands.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.arg;
+import static io.github.renepanke.commands.shared.Middleware.auth;
 
 public class STRU implements Command {
 

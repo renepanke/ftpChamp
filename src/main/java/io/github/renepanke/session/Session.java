@@ -3,7 +3,6 @@ package io.github.renepanke.session;
 import io.github.renepanke.RequestHandler;
 import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
-import io.github.renepanke.commands.ConnectionMode;
 import io.github.renepanke.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,11 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.session.Session;
 
 import java.net.Socket;
 
-import static io.github.renepanke.commands.Middleware.auth;
+import static io.github.renepanke.commands.shared.Middleware.auth;
 
 public class PWD implements Command {
 

@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.commands.replies.Reply;
 

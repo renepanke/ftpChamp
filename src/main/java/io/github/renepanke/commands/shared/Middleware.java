@@ -1,10 +1,9 @@
-package io.github.renepanke.commands;
+package io.github.renepanke.commands.shared;
 
 import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.lang.Strings;
 import io.github.renepanke.commands.replies.Reply;
-import io.github.renepanke.commands.shared.FileTransferFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

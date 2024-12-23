@@ -1,6 +1,7 @@
 package io.github.renepanke.session;
 
 import io.github.renepanke.commands.*;
+import io.github.renepanke.commands.shared.Command;
 
 import java.util.HashMap;
 import java.util.Map;

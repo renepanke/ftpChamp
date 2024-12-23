@@ -1,5 +1,6 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.shared.Command;
 import io.github.renepanke.session.Session;
 import io.github.renepanke.commands.replies.Reply;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static io.github.renepanke.commands.Middleware.*;
+import static io.github.renepanke.commands.shared.Middleware.*;
 
 public class RETR implements Command {
 
