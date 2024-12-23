@@ -2,7 +2,7 @@ package io.github.renepanke;
 
 import io.github.renepanke.session.Session;
 import io.github.renepanke.session.CommandRegistry;
-import io.github.renepanke.session.Command;
+import io.github.renepanke.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
