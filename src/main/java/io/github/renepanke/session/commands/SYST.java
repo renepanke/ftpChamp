@@ -6,12 +6,14 @@ import io.github.renepanke.session.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.Socket;
+
 public class SYST implements Command {
 
     private static final Logger LOG = LoggerFactory.getLogger(SYST.class);
 
     @Override
-    public void handle(String argument, Session session) {
+    public void handle(String argument, Session session, Socket socket) {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win")) {
             session.sendResponse("215 DOS/360 system type.");

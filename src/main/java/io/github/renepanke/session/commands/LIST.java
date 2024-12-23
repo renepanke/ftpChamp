@@ -1,6 +1,5 @@
 package io.github.renepanke.session.commands;
 
-import io.github.renepanke.exceptions.FTPServerException;
 import io.github.renepanke.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.fs.FileSystem;
 import io.github.renepanke.lang.Strings;
@@ -21,11 +20,51 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.github.renepanke.lang.Bools.not;
+import static io.github.renepanke.session.Middleware.*;
 
 public class LIST implements Command {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIST.class);
-    public static final boolean AUTO_FLUSH = true;
+    private static final boolean AUTO_FLUSH = true;
+
+    private final Command innerCommand;
+
+    public LIST() {
+        innerCommand = auth(data((argument, session, socket) -> {
+            switch (session.getConnectionMode()) {
+                case ACTIVE -> {
+                    if (session.getActiveClientDataAddress() == null || session.getActiveClientDataPort() == Session.UNINITIALIZED_PORT) {
+                        LOG.warn("Need to call PORT before calling list when using an active connection, returning 503 Bad Sequence of Commands.");
+                        Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                        return;
+                    }
+                }
+                case PASSIVE -> {
+                    if (session.getPassiveServerSocket() == null || session.getPassiveDataPort() == Session.UNINITIALIZED_PORT) {
+                        LOG.warn("Need to call PASV before calling list when using a passive connection, returning 503 Bad Sequence of Commands.");
+                        Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                        return;
+                    }
+                }
+                case UNINITIALIZED -> {
+                    LOG.warn("Neither PASV nor PORT was called before retrieving list, returning 503 Bad Sequence of Commands.");
+                    Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+                    return;
+                }
+                default -> {
+                    Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
+                    return;
+                }
+            }
+
+            Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
+            switch (session.getConnectionMode()) {
+                case ACTIVE, PASSIVE -> sendList(argument, session, socket);
+                case EXTENDED_PASSIVE -> Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
+                default -> Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
+            }
+        }));
+    }
 
     /**
      * LIST [<SP> <pathname>] <CRLF>
@@ -36,76 +75,14 @@ public class LIST implements Command {
      * @param session
      */
     @Override
-    public void handle(String argument, Session session) {
-        session.requireAuthOr530NotLoggedIn();
-
-        switch (session.getConnectionMode()) {
-            case ACTIVE -> {
-                if (session.getActiveClientDataAddress() == null || session.getActiveClientDataPort() == Session.UNINITIALIZED_PORT) {
-                    LOG.warn("Need to call PORT before calling list when using an active connection, returning 503 Bad Sequence of Commands.");
-                    Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
-                    return;
-                }
-            }
-            case PASSIVE -> {
-                if (session.getPassiveServerSocket() == null || session.getPassiveDataPort() == Session.UNINITIALIZED_PORT) {
-                    LOG.warn("Need to call PASV before calling list when using a passive connection, returning 503 Bad Sequence of Commands.");
-                    Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
-                    return;
-                }
-            }
-            case UNINITIALIZED -> {
-                LOG.warn("Neither PASV nor PORT was called before retrieving list, returning 503 Bad Sequence of Commands.");
-                Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
-                return;
-            }
-            default -> {
-                Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
-                return;
-            }
-        }
-
-        Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
-        switch (session.getConnectionMode()) {
-            case ACTIVE -> sendListActive(argument, session);
-            case PASSIVE -> sendListPassive(argument, session);
-            case EXTENDED_PASSIVE -> Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
-            default -> Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
-        }
+    public void handle(String argument, Session session, Socket socket) {
+        this.innerCommand.handle(argument, session, socket);
     }
 
-    private void sendListPassive(String argument, Session session) {
-        try (Socket socket = session.acceptPassiveConnection(); PrintWriter out = getPrintWriter(socket, session)) {
+    private void sendList(String argument, Session session, Socket socket) {
+        try (PrintWriter out = getPrintWriter(socket, session)) {
             sendListToPrintWriter(argument, session, out);
             Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
-        } catch (IOException | FTPServerException e) {
-            LOG.atError().setCause(e).log("Can't open passive connection");
-            Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
-        } finally {
-            session.closePassiveSocket();
-        }
-    }
-
-    private void sendListActive(String argument, Session session) {
-        Socket dataSocket = null;
-        PrintWriter out = null;
-
-        try {
-            dataSocket = getActiveDataSocket(session);
-            out = getPrintWriter(dataSocket, session);
-            sendListToPrintWriter(argument, session, out);
-        } catch (Exception e) {
-            LOG.error("", e);
-        } finally {
-            Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
-            if (out != null) out.close();
-            if (dataSocket != null && not(dataSocket.isClosed())) {
-                try {
-                    dataSocket.close();
-                } catch (IOException e) {
-                    LOG.atError().setCause(e).log("Failed to close data socket");
-                }
-            }
         }
     }
 
@@ -150,23 +127,4 @@ public class LIST implements Command {
         }
     }
 
-    private static Socket getActiveDataSocket(Session session) {
-        try {
-            return new Socket(session.getActiveClientDataAddress(), session.getActiveClientDataPort());
-        } catch (IOException | SecurityException e) {
-            LOG.atError().setCause(e).log("Failed to create data socket");
-            Reply.TransientNegativeCompletion.send_425_CantOpenDataConnection(session);
-            throw new FTPServerRuntimeException(e);
-        } catch (IllegalArgumentException e) {
-            LOG.atError().setCause(e)
-                    .addArgument(session::getActiveClientDataPort)
-                    .log("Failed to create data socket because specified port <{}> is invalid.");
-            Reply.TransientNegativeCompletion.send_451_RequestedActionAbortedLocalErrorInProcessing(session);
-            throw new FTPServerRuntimeException(e);
-        } catch (NullPointerException e) {
-            LOG.atError().setCause(e)
-                    .log("Data Address from session is null.");
-            throw new FTPServerRuntimeException(e);
-        }
-    }
 }

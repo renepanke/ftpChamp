@@ -1,7 +1,9 @@
 package io.github.renepanke.session.commands;
 
-import io.github.renepanke.session.Session;
 import io.github.renepanke.session.Command;
+import io.github.renepanke.session.Session;
+
+import java.net.Socket;
 
 public class USER implements Command {
 
@@ -15,7 +17,7 @@ public class USER implements Command {
      * @param session
      */
     @Override
-    public void handle(String argument, Session session) {
+    public void handle(String argument, Session session, Socket socket) {
         if (session.isAuthenticated()) {
             session.sendResponse("230 User logged in, proceed.");
             return;

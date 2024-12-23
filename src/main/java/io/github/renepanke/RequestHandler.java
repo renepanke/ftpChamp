@@ -49,7 +49,7 @@ public class RequestHandler implements Runnable {
                 String command = parts[0].toUpperCase();
                 String argument = parts.length > 1 ? parts[1] : "";
                 Command commandState = CommandRegistry.get(command);
-                commandState.handle(argument, context);
+                commandState.handle(argument, context, null);
             }
         } catch (IOException e) {
             LOG.atError().setCause(e).addArgument(e::getMessage).log("Error handling client: <{}>");
