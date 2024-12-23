@@ -1,6 +1,5 @@
 package io.github.renepanke.ftpchamp.configuration;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -12,17 +11,21 @@ public class YamlConfiguration {
     private Optional<Integer> passiveRangePortsLowerBound = Optional.empty();
     private Optional<Integer> passiveRangePortsUpperBound = Optional.empty();
     private Optional<Long> findPassivePortTimeoutInMs = Optional.empty();
+    private Optional<String> certificatePath = Optional.empty();
+    private Optional<String> privateKeyPath = Optional.empty();
 
     public YamlConfiguration() {
     }
 
-    public YamlConfiguration(Optional<Integer> serverPort, Optional<Integer> threadPoolSize, Optional<String> workingDirectory, Optional<Integer> passiveRangePortsLowerBound, Optional<Integer> passiveRangePortsUpperBound, Optional<Long> passiveRangeFindPortTimeout) {
+    public YamlConfiguration(Optional<Integer> serverPort, Optional<Integer> threadPoolSize, Optional<String> workingDirectory, Optional<Integer> passiveRangePortsLowerBound, Optional<Integer> passiveRangePortsUpperBound, Optional<Long> passiveRangeFindPortTimeout, Optional<String> certificatePath, Optional<String> privateKeyPath) {
         this.serverPort = serverPort;
         this.threadPoolSize = threadPoolSize;
         this.workingDirectory = workingDirectory;
         this.passiveRangePortsLowerBound = passiveRangePortsLowerBound;
         this.passiveRangePortsUpperBound = passiveRangePortsUpperBound;
         this.findPassivePortTimeoutInMs = passiveRangeFindPortTimeout;
+        this.certificatePath = certificatePath;
+        this.privateKeyPath = privateKeyPath;
     }
 
     public Optional<Integer> getServerPort() {
@@ -73,27 +76,19 @@ public class YamlConfiguration {
         this.findPassivePortTimeoutInMs = findPassivePortTimeoutInMs;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        YamlConfiguration that = (YamlConfiguration) o;
-        return Objects.equals(serverPort, that.serverPort) && Objects.equals(threadPoolSize, that.threadPoolSize) && Objects.equals(workingDirectory, that.workingDirectory) && Objects.equals(passiveRangePortsLowerBound, that.passiveRangePortsLowerBound) && Objects.equals(passiveRangePortsUpperBound, that.passiveRangePortsUpperBound) && Objects.equals(findPassivePortTimeoutInMs, that.findPassivePortTimeoutInMs);
+    public Optional<String> getCertificatePath() {
+        return certificatePath;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(serverPort, threadPoolSize, workingDirectory, passiveRangePortsLowerBound, passiveRangePortsUpperBound, findPassivePortTimeoutInMs);
+    public void setCertificatePath(Optional<String> certificatePath) {
+        this.certificatePath = certificatePath;
     }
 
-    @Override
-    public String toString() {
-        return "YamlConfiguration{" +
-                "serverPort=" + serverPort +
-                ", threadPoolSize=" + threadPoolSize +
-                ", workingDirectory=" + workingDirectory +
-                ", passiveRangePortsLowerBound=" + passiveRangePortsLowerBound +
-                ", passiveRangePortsUpperBound=" + passiveRangePortsUpperBound +
-                ", passiveRangeFindPortTimeout=" + findPassivePortTimeoutInMs +
-                '}';
+    public Optional<String> getPrivateKeyPath() {
+        return privateKeyPath;
+    }
+
+    public void setPrivateKeyPath(Optional<String> privateKeyPath) {
+        this.privateKeyPath = privateKeyPath;
     }
 }

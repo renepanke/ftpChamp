@@ -4,3 +4,5 @@ workingDirectory: "C:\\Users\\dev\\ä-test"
 passiveRangePortsLowerBound: 50000
 passiveRangePortsUpperBound: 50002
 findPassivePortTimeoutInMs: 5000
+certificatePath: "C:\\Users\\dev\\IdeaProjects\\ftpChamp\\src\\main\\bash\\cert.pem"
+privateKeyPath: "C:\\Users\\dev\\IdeaProjects\\ftpChamp\\src\\main\\bash\\key.pem"

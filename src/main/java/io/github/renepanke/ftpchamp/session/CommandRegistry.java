@@ -9,6 +9,7 @@ import java.util.Map;
 public class CommandRegistry {
 
     public static final Map<String, Command> commands = new HashMap<>() {{
+        put("AUTH", new AUTH());
         put("CDUP", new CDUP());
         put("CWD", new CWD());
         put("DELE", new DELE());

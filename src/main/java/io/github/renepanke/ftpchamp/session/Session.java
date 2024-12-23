@@ -10,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -32,8 +36,9 @@ public class Session {
     public static final String CRLF = "\r\n";
     public static final int RANDOM_PORT = 0;
     private final String id;
-    private final Socket socket;
-    private final PrintWriter out;
+    private BufferedReader in;
+    private Socket socket;
+    private PrintWriter out;
     private final RequestHandler sessionSpecificRequestHandler;
     private boolean authenticated = false;
     private Path workingDirectory = Configuration.get().getWorkingDirectory();
@@ -47,6 +52,7 @@ public class Session {
     private ConnectionMode connectionMode = ConnectionMode.UNINITIALIZED;
     private ServerSocket passiveServerSocket;
     private int passiveDataPort = UNINITIALIZED_PORT;
+    private SecurityMechanism securityMechanism = SecurityMechanism.UNINITIALIZED;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.id = Hash.getSHA1Length7For(UUID.randomUUID().toString());
@@ -55,6 +61,7 @@ public class Session {
         this.sessionSpecificRequestHandler = sessionRequestHandler;
         try {
             this.out = new PrintWriter(socket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
             throw new FTPServerRuntimeException(e);
         }
@@ -243,5 +250,40 @@ public class Session {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public SecurityMechanism getSecurityMechanism() {
+        return securityMechanism;
+    }
+
+    public void setSecurityMechanism(SecurityMechanism securityMechanism) {
+        switch (securityMechanism) {
+            case TLS, SSL -> {
+                this.securityMechanism = securityMechanism;
+            }
+            default -> {
+                this.securityMechanism = SecurityMechanism.UNINITIALIZED;
+            }
+        }
+    }
+
+    public void upgradeConnectionToTls() {
+        try {
+            SSLSocketFactory sslSocketFactory = Configuration.get().getSslContext().getSocketFactory();
+            SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(socket, socket.getInetAddress().getHostAddress(), socket.getLocalPort(), true);
+            this.socket = sslSocket;
+            this.out = new PrintWriter(sslSocket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            sslSocket.setUseClientMode(false);
+            sslSocket.startHandshake();
+            this.setSecurityMechanism(SecurityMechanism.TLS);
+        } catch (IOException e) {
+            LOG.atError().setCause(e).log("Failed to initialize security mechanism");
+            Reply.PermanentNegativeCompletion.send_535_FailedSecurityCheck(this);
+        }
+    }
+
+    public String readLine() throws IOException {
+        return this.in.readLine();
     }
 }

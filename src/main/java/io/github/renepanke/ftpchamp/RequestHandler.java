@@ -17,29 +17,27 @@ public class RequestHandler implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RequestHandler.class);
 
-    private final Socket clientSocket;
+    private Socket socket;
     private final AtomicBoolean shallAcceptConnections = new AtomicBoolean(true);
 
-    public RequestHandler(Socket clientSocket) {
-        this.clientSocket = clientSocket;
+    public RequestHandler(Socket socket) {
+        this.socket = socket;
     }
 
     @Override
     public void run() {
         BufferedReader in = null;
         try {
-            Session context = new Session(this.clientSocket, this);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            context.sendResponse("220 Service ready for new user.");
+            Session session = new Session(this.socket, this);
+            session.sendResponse("220 Service ready for new user.");
 
             while (this.shallAcceptConnections.get()) {
-                String line = in.readLine();
+                String line = session.readLine();
                 if (line == null) break;
 
                 LOG.atInfo()
                         .addArgument(line)
-                        .addArgument(() -> clientSocket.getInetAddress().toString())
+                        .addArgument(() -> socket.getInetAddress().toString())
                         .log("Received <{}> from <{}>");
 
                 String[] parts = line.split(" ", 2);
@@ -50,7 +48,7 @@ public class RequestHandler implements Runnable {
                 String command = parts[0].toUpperCase();
                 String argument = parts.length > 1 ? parts[1] : "";
                 Command commandState = CommandRegistry.get(command);
-                commandState.handle(argument, context, null);
+                commandState.handle(argument, session, null);
             }
         } catch (IOException e) {
             LOG.atError().setCause(e).addArgument(e::getMessage).log("Error handling client: <{}>");
@@ -61,6 +59,14 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
     public void quitSession() {
         MDC.remove("sessionId");
         this.shallAcceptConnections.set(false);
@@ -69,7 +75,7 @@ public class RequestHandler implements Runnable {
 
     private void closeClientSocket() {
         try {
-            this.clientSocket.close();
+            this.socket.close();
         } catch (IOException e) {
             LOG.atError().setCause(e).addArgument(e::getMessage).log("Error closing client: <{}>");
         }

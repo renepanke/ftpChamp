@@ -104,6 +104,28 @@ public class Reply {
             session.sendResponse("230 User logged in, proceed.");
         }
 
+        public static void send_232_UserLoggedInAuthorizedBySecurityDataExchange(Session session) {
+            session.sendResponse("232 User logged in, authorized by security data exchange.");
+        }
+
+        public static void send_234_SecurityDataExchangeComplete(Session session) {
+            session.sendResponse("234 Security data exchange complete.");
+        }
+
+        /**
+         * This reply indicates that the security data exchange completed successfully.
+         *
+         * @param base64data
+         * @param session
+         */
+        public static void send_235_ADAT(String base64data, Session session) {
+            if (base64data == null) {
+                session.sendResponse("235");
+                return;
+            }
+            session.sendResponse("235 ADAT=" + base64data);
+        }
+
         public static void send_250_RequestedFileActionOkayCompleted(Session session) {
             session.sendResponse("250 Requested file action okay, completed.");
         }
@@ -124,6 +146,47 @@ public class Reply {
 
         public static void send_332_NeedAccountForLogin(Session session) {
             session.sendResponse("332 Need account for login.");
+        }
+
+        /**
+         * This reply indicates that the requested security mechanism is ok, and includes security data to be used by
+         * the client to construct the next command.
+         *
+         * @param base64data
+         * @param session
+         */
+        public static void send_334_ADAT(String base64data, Session session) {
+            if (base64data == null) {
+                session.sendResponse("334");
+                return;
+            }
+            session.sendResponse("334 ADAT=" + base64data);
+        }
+
+        /**
+         * This reply indicates that the security data is acceptable, and more is required to complete the security
+         * data exchange.
+         *
+         * @param base64data
+         * @param session
+         */
+        public static void send_335_ADAT(String base64data, Session session) {
+            if (base64data == null) {
+                session.sendResponse("335");
+                return;
+            }
+            session.sendResponse("335 ADAT=" + base64data);
+        }
+
+        /**
+         * The exact representation of the challenge should be chosen by the mechanism to be sensible to the human user
+         * of the system.
+         *
+         * @param challenge
+         * @param session
+         */
+        public static void send_336_UsernameOkayNeedPasswordChallengeIs(String challenge, Session session) {
+            session.sendResponse("336 Username okay, need password.  Challenge is \"" + challenge + "\"");
         }
 
         public static void send_350_RequestedFileActionPendingFurtherInformation(Session session) {
@@ -150,6 +213,10 @@ public class Reply {
 
         public static void send_426_ConnectionClosedTransferAborted(Session session) {
             session.sendResponse("426 Connection closed; transfer aborted.");
+        }
+
+        public static void send_431_NeedSomeUnavailableResourcesToProcessSecurity(Session session) {
+            session.sendResponse("431 Need some unavailable resources to process security.");
         }
 
         /**
@@ -210,6 +277,26 @@ public class Reply {
 
         public static void send_532_NeedAccountForStoringFiles(Session session) {
             session.sendResponse("532 Need account for storing files.");
+        }
+
+        public static void send_533_CommandProtectionLevelDeniedForPolicyReasons(Session session) {
+            session.sendResponse("533 Command protection level denied for policy reasons.");
+        }
+
+        public static void send_534_RequestDeniedForPolicyReasons(Session session) {
+            session.sendResponse("534 Request denied for policy reasons.");
+        }
+
+        public static void send_535_FailedSecurityCheck(Session session) {
+            session.sendResponse("535 Failed security check (hash, sequence, etc).");
+        }
+
+        public static void send_536_RequestedPROTLevelNotSupportedByMechanism(Session session) {
+            session.sendResponse("536 Requested PROT level not supported by mechanism.");
+        }
+
+        public static void send_537_CommandProtectionLevelNotSupportedBySecurityMechanism(Session session) {
+            session.sendResponse("537 Command protection level not supported by security mechanism.");
         }
 
         /**
