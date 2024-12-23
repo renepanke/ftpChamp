@@ -1,15 +1,14 @@
 package io.github.renepanke.commands;
 
+import io.github.renepanke.commands.replies.Reply;
 import io.github.renepanke.fs.FileSystem;
 import io.github.renepanke.session.Session;
-import io.github.renepanke.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.Socket;
 import java.nio.file.Path;
 
-import static io.github.renepanke.commands.Middleware.arg;
 import static io.github.renepanke.commands.Middleware.auth;
 
 public class CDUP implements Command {
