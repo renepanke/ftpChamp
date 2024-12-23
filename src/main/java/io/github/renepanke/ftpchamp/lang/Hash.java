@@ -8,8 +8,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class Hash {
 
-    public static String getFor(String input) {
-        MessageDigest digest = null;
+    public static String getSHA1Length7For(String input) {
+        MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {

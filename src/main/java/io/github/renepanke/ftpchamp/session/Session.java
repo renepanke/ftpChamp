@@ -49,7 +49,7 @@ public class Session {
     private int passiveDataPort = UNINITIALIZED_PORT;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
-        this.id = Hash.getFor(UUID.randomUUID().toString());
+        this.id = Hash.getSHA1Length7For(UUID.randomUUID().toString());
         MDC.put("sessionId", id);
         this.socket = socket;
         this.sessionSpecificRequestHandler = sessionRequestHandler;
