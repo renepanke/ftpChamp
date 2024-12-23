@@ -88,7 +88,7 @@ public class YamlConfiguration {
     @Override
     public String toString() {
         return "YamlConfiguration{" +
-                "port=" + serverPort +
+                "serverPort=" + serverPort +
                 ", threadPoolSize=" + threadPoolSize +
                 ", workingDirectory=" + workingDirectory +
                 ", passiveRangePortsLowerBound=" + passiveRangePortsLowerBound +
