@@ -19,7 +19,7 @@ public class CDUP implements Command {
     private final Command innerCommand;
 
     public CDUP() {
-        innerCommand = auth(arg((argument, session, ignored) -> {
+        innerCommand = auth((argument, session, ignored) -> {
             LOG.atDebug().addArgument(() -> session.getWorkingDirectory().toAbsolutePath().toString())
                     .log("Current working directory: <{}>");
             Path parent = FileSystem.getParent(session.getWorkingDirectory());
@@ -29,7 +29,7 @@ public class CDUP implements Command {
             }
             session.setWorkingDirectory(parent);
             Reply.PositiveCompletion.send_200_CommandOkay(session);
-        }));
+        });
     }
 
     @Override
