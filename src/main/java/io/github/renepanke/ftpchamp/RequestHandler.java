@@ -1,10 +1,11 @@
 package io.github.renepanke.ftpchamp;
 
-import io.github.renepanke.ftpchamp.session.Session;
-import io.github.renepanke.ftpchamp.session.CommandRegistry;
 import io.github.renepanke.ftpchamp.commands.shared.Command;
+import io.github.renepanke.ftpchamp.session.CommandRegistry;
+import io.github.renepanke.ftpchamp.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class RequestHandler implements Runnable {
     }
 
     public void quitSession() {
+        MDC.remove("sessionId");
         this.shallAcceptConnections.set(false);
     }
 

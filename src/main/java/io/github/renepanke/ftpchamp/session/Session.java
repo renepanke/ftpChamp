@@ -5,8 +5,10 @@ import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import io.github.renepanke.ftpchamp.configuration.Configuration;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerException;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
+import io.github.renepanke.ftpchamp.lang.Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +18,7 @@ import java.net.Socket;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Random;
+import java.util.UUID;
 
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
 
@@ -28,6 +31,7 @@ public class Session {
     private static final Logger LOG = LoggerFactory.getLogger(Session.class);
     public static final String CRLF = "\r\n";
     public static final int RANDOM_PORT = 0;
+    private final String id;
     private final Socket socket;
     private final PrintWriter out;
     private final RequestHandler sessionSpecificRequestHandler;
@@ -45,6 +49,8 @@ public class Session {
     private int passiveDataPort = UNINITIALIZED_PORT;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
+        this.id = Hash.getFor(UUID.randomUUID().toString());
+        MDC.put("sessionId", id);
         this.socket = socket;
         this.sessionSpecificRequestHandler = sessionRequestHandler;
         try {
@@ -64,6 +70,10 @@ public class Session {
         if (this.isNotAuthenticated()) {
             Reply.PermanentNegativeCompletion.send_530_NotLoggedIn(this);
         }
+    }
+
+    public String getId() {
+        return id;
     }
 
     public boolean isAuthenticated() {
