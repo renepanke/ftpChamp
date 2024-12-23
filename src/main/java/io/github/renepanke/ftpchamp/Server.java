@@ -33,6 +33,7 @@ public class Server {
         shallRun = new AtomicBoolean(true);
         // TODO:    Investigate if VirtualThreads are feasible for this.
         threadPool = Executors.newFixedThreadPool(Configuration.get().getThreadPoolSize());
+        LOG.info("ftpChamp Server started");
         while (shallRun.get()) {
             try {
                 Socket clientSocket = this.socket.accept();
