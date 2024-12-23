@@ -1,4 +1,4 @@
-package io.github.renepanke.commands;
+package io.github.renepanke.session;
 
 public enum ConnectionMode {
     ACTIVE,
