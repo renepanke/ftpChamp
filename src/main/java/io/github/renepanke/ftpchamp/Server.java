@@ -1,5 +1,6 @@
 package io.github.renepanke.ftpchamp;
 
+import io.github.renepanke.ftpchamp.configuration.Configuration;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class Server {
 
     public Server() {
         try {
-            this.socket = new ServerSocket(DEFAULT_PORT);
+            this.socket = new ServerSocket(Configuration.get().getServerPort());
         } catch (IOException e) {
             throw new FTPServerRuntimeException(e);
         }
@@ -31,7 +32,7 @@ public class Server {
     public void start() {
         shallRun = new AtomicBoolean(true);
         // TODO:    Investigate if VirtualThreads are feasible for this.
-        threadPool = Executors.newFixedThreadPool(10);
+        threadPool = Executors.newFixedThreadPool(Configuration.get().getThreadPoolSize());
         while (shallRun.get()) {
             try {
                 Socket clientSocket = this.socket.accept();
@@ -51,8 +52,7 @@ public class Server {
                 shallRun.set(false);
             }
             LOG.debug("Stopped listening for connections");
-        }
-        finally {
+        } finally {
             if (threadPool != null) {
                 LOG.debug("Shutting down thread pool");
                 threadPool.shutdown();
