@@ -17,11 +17,13 @@ public class Configuration {
     public static final Path DEFAULT_WORKING_DIRECTORY = Path.of(System.getProperty("user.dir"));
     public static final int DEFAULT_PASSIVE_PORTS_LOWER_BOUND = 61000;
     public static final int DEFAULT_PASSIVE_PORTS_UPPER_BOUND = 61100;
+    public static final long DEFAULT_FIND_PASSIVE_PORT_TIMEOUT_IN_MS = 5000L;
     private final int serverPort;
     private final int threadPoolSize;
     private final Path workingDirectory;
     private final int passiveRangePortsLowerBound;
     private final int passiveRangePortsUpperBound;
+    private final long findPassivePortTimeoutInMs;
 
     private Configuration() {
         try {
@@ -33,6 +35,7 @@ public class Configuration {
             this.workingDirectory = yamlConfiguration.getWorkingDirectory().map(Path::of).orElse(DEFAULT_WORKING_DIRECTORY);
             this.passiveRangePortsLowerBound = yamlConfiguration.getPassiveRangePortsLowerBound().orElse(DEFAULT_PASSIVE_PORTS_LOWER_BOUND);
             this.passiveRangePortsUpperBound = yamlConfiguration.getPassiveRangePortsUpperBound().orElse(DEFAULT_PASSIVE_PORTS_UPPER_BOUND);
+            this.findPassivePortTimeoutInMs = yamlConfiguration.getFindPassivePortTimeoutInMs().orElse(DEFAULT_FIND_PASSIVE_PORT_TIMEOUT_IN_MS);
         } catch (IOException e) {
             throw new FTPServerRuntimeException(e);
         }
@@ -74,5 +77,9 @@ public class Configuration {
 
     public int getPassiveRangePortsUpperBound() {
         return passiveRangePortsUpperBound;
+    }
+
+    public long getFindPassivePortTimeoutInMs() {
+        return findPassivePortTimeoutInMs;
     }
 }

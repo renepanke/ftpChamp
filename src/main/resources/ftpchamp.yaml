@@ -2,4 +2,5 @@ serverPort: 21
 threadPoolSize: 15
 workingDirectory: "C:\\Users\\dev\\ä-test"
 passiveRangePortsLowerBound: 50000
-passiveRangePortsUpperBound: 50100
+passiveRangePortsUpperBound: 50002
+findPassivePortTimeoutInMs: 5000

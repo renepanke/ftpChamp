@@ -6,21 +6,23 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class YamlConfiguration {
 
-    private Optional<Integer> serverPort;
-    private Optional<Integer> threadPoolSize;
-    private Optional<String> workingDirectory;
-    private Optional<Integer> passiveRangePortsLowerBound;
-    private Optional<Integer> passiveRangePortsUpperBound;
+    private Optional<Integer> serverPort = Optional.empty();
+    private Optional<Integer> threadPoolSize = Optional.empty();
+    private Optional<String> workingDirectory = Optional.empty();
+    private Optional<Integer> passiveRangePortsLowerBound = Optional.empty();
+    private Optional<Integer> passiveRangePortsUpperBound = Optional.empty();
+    private Optional<Long> findPassivePortTimeoutInMs = Optional.empty();
 
     public YamlConfiguration() {
     }
 
-    public YamlConfiguration(Optional<Integer> serverPort, Optional<Integer> threadPoolSize, Optional<String> workingDirectory, Optional<Integer> passiveRangePortsLowerBound, Optional<Integer> passiveRangePortsUpperBound) {
+    public YamlConfiguration(Optional<Integer> serverPort, Optional<Integer> threadPoolSize, Optional<String> workingDirectory, Optional<Integer> passiveRangePortsLowerBound, Optional<Integer> passiveRangePortsUpperBound, Optional<Long> passiveRangeFindPortTimeout) {
         this.serverPort = serverPort;
         this.threadPoolSize = threadPoolSize;
         this.workingDirectory = workingDirectory;
         this.passiveRangePortsLowerBound = passiveRangePortsLowerBound;
         this.passiveRangePortsUpperBound = passiveRangePortsUpperBound;
+        this.findPassivePortTimeoutInMs = passiveRangeFindPortTimeout;
     }
 
     public Optional<Integer> getServerPort() {
@@ -63,16 +65,24 @@ public class YamlConfiguration {
         this.passiveRangePortsUpperBound = passiveRangePortsUpperBound;
     }
 
+    public Optional<Long> getFindPassivePortTimeoutInMs() {
+        return findPassivePortTimeoutInMs;
+    }
+
+    public void setFindPassivePortTimeoutInMs(Optional<Long> findPassivePortTimeoutInMs) {
+        this.findPassivePortTimeoutInMs = findPassivePortTimeoutInMs;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         YamlConfiguration that = (YamlConfiguration) o;
-        return Objects.equals(serverPort, that.serverPort) && Objects.equals(threadPoolSize, that.threadPoolSize) && Objects.equals(workingDirectory, that.workingDirectory) && Objects.equals(passiveRangePortsLowerBound, that.passiveRangePortsLowerBound) && Objects.equals(passiveRangePortsUpperBound, that.passiveRangePortsUpperBound);
+        return Objects.equals(serverPort, that.serverPort) && Objects.equals(threadPoolSize, that.threadPoolSize) && Objects.equals(workingDirectory, that.workingDirectory) && Objects.equals(passiveRangePortsLowerBound, that.passiveRangePortsLowerBound) && Objects.equals(passiveRangePortsUpperBound, that.passiveRangePortsUpperBound) && Objects.equals(findPassivePortTimeoutInMs, that.findPassivePortTimeoutInMs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serverPort, threadPoolSize, workingDirectory, passiveRangePortsLowerBound, passiveRangePortsUpperBound);
+        return Objects.hash(serverPort, threadPoolSize, workingDirectory, passiveRangePortsLowerBound, passiveRangePortsUpperBound, findPassivePortTimeoutInMs);
     }
 
     @Override
@@ -83,6 +93,7 @@ public class YamlConfiguration {
                 ", workingDirectory=" + workingDirectory +
                 ", passiveRangePortsLowerBound=" + passiveRangePortsLowerBound +
                 ", passiveRangePortsUpperBound=" + passiveRangePortsUpperBound +
+                ", passiveRangeFindPortTimeout=" + findPassivePortTimeoutInMs +
                 '}';
     }
 }

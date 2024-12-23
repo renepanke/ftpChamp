@@ -1,9 +1,10 @@
 package io.github.renepanke.ftpchamp.session;
 
 import io.github.renepanke.ftpchamp.RequestHandler;
+import io.github.renepanke.ftpchamp.commands.replies.Reply;
+import io.github.renepanke.ftpchamp.configuration.Configuration;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerException;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
-import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Random;
 
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
 
@@ -30,7 +32,7 @@ public class Session {
     private final PrintWriter out;
     private final RequestHandler sessionSpecificRequestHandler;
     private boolean authenticated = false;
-    private Path workingDirectory = Path.of(System.getProperty("user.home"));
+    private Path workingDirectory = Configuration.get().getWorkingDirectory();
     private DataTransferType dataTransferType = DataTransferType.IMAGE;
     private InetAddress activeClientDataAddress;
     private int activeClientDataPort = UNINITIALIZED_PORT;
@@ -166,7 +168,7 @@ public class Session {
             throw new FTPServerException("Passive server socket already open.");
         }
         try {
-            passiveServerSocket = new ServerSocket(RANDOM_PORT, DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
+            passiveServerSocket = new ServerSocket(findAvailablePortInPortRange(), DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
             passiveDataPort = passiveServerSocket.getLocalPort();
         } catch (IOException e) {
             throw new FTPServerException(e);
@@ -203,5 +205,33 @@ public class Session {
 
     public ServerSocket getPassiveServerSocket() {
         return passiveServerSocket;
+    }
+
+    private int findAvailablePortInPortRange() throws FTPServerException {
+        long startTime = System.currentTimeMillis();
+        Random random = new Random();
+        long timeOutMs = Configuration.get().getFindPassivePortTimeoutInMs();
+        Integer port = null;
+
+        while (System.currentTimeMillis() - startTime < timeOutMs) {
+            int currentRandomPort = Configuration.get().getPassiveRangePortsLowerBound() + random.nextInt(Configuration.get().getPassiveRangePortsUpperBound() - Configuration.get().getPassiveRangePortsLowerBound() + 1);
+            if (isPortAvailable(currentRandomPort)) {
+                port = currentRandomPort;
+                break;
+            }
+        }
+        if (port == null)
+            throw new FTPServerException("Timeout reached while trying to find an available port in the specified port range.");
+
+        return port;
+    }
+
+    private boolean isPortAvailable(int port) {
+        try (ServerSocket s = new ServerSocket(port)) {
+            s.setReuseAddress(true);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
