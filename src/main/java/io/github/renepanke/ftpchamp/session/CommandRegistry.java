@@ -28,6 +28,7 @@ public class CommandRegistry {
         put("RMD", new RMD());
         put("RNFR", new RNFR());
         put("RNTO", new RNTO());
+        put("SIZE", new SIZE());
         put("SMNT", new SMNT());
         put("STOR", new STOR());
         put("SYST", new SYST());
