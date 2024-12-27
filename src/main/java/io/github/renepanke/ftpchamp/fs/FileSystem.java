@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
@@ -91,6 +93,24 @@ public class FileSystem {
         try {
             return new SimpleDateFormat("MMM dd HH:mm")
                     .format(new Date(Files.readAttributes(path, BasicFileAttributes.class).lastModifiedTime().toMillis()));
+        } catch (IOException e) {
+            LOG.error("", e);
+            throw new FTPServerRuntimeException(e);
+        }
+    }
+
+    /**
+     * Modification Date Time as per RFC 3659
+     *
+     * @param path
+     * @return
+     */
+    public static String modificationDateTime(Path path) {
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class).lastModifiedTime()
+                    .toInstant()
+                    .atZone(ZoneId.of("UTC"))
+                    .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]"));
         } catch (IOException e) {
             LOG.error("", e);
             throw new FTPServerRuntimeException(e);

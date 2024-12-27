@@ -55,8 +55,8 @@ public class Reply {
             session.sendResponse("212 Directory status.");
         }
 
-        public static void send_213_FileStatus(Session session) {
-            session.sendResponse("213 File status.");
+        public static void send_213_FileStatus(String fileStatus, Session session) {
+            session.sendResponse("213 " + fileStatus);
         }
 
         /**

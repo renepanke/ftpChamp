@@ -15,6 +15,7 @@ public class CommandRegistry {
         put("DELE", new DELE());
         put("FEAT", new FEAT());
         put("LIST", new LIST());
+        put("MDTM", new MDTM());
         put("MKD", new MKD());
         put("MODE", new MODE());
         put("NOOP", new NOOP());
