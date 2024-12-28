@@ -130,6 +130,10 @@ public class Reply {
             session.sendResponse("250 Requested file action okay, completed.");
         }
 
+        public static void send_250_RequestFileActionOkayCompletedMLST(String listingString, Session session) {
+            session.sendResponse("250 Requested file action okay, completed.\r\n" + listingString);
+        }
+
         public static void send_257_PathnameCreated(String pathName, Session session) {
             session.sendResponse("257 \"" + pathName + "\" created.");
         }

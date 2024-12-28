@@ -5,20 +5,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Optional;
 
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
 
 public class FileSystem {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class);
+    public static final String RFC_3659_DATE_TIME_FORMAT = "yyyyMMddHHmmss[.SSS]";
 
     public static String unixLikePermissionString(Path path) {
         LOG.trace("Entering unixLikePermissionString");
@@ -110,7 +115,19 @@ public class FileSystem {
             return Files.readAttributes(path, BasicFileAttributes.class).lastModifiedTime()
                     .toInstant()
                     .atZone(ZoneId.of("UTC"))
-                    .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]"));
+                    .format(DateTimeFormatter.ofPattern(RFC_3659_DATE_TIME_FORMAT));
+        } catch (IOException e) {
+            LOG.error("", e);
+            throw new FTPServerRuntimeException(e);
+        }
+    }
+
+    public static String creationDateTime(Path path) {
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class).creationTime()
+                    .toInstant()
+                    .atZone(ZoneId.of("UTC"))
+                    .format(DateTimeFormatter.ofPattern(RFC_3659_DATE_TIME_FORMAT));
         } catch (IOException e) {
             LOG.error("", e);
             throw new FTPServerRuntimeException(e);
@@ -147,6 +164,33 @@ public class FileSystem {
         } catch (Exception e) {
             LOG.error("", e);
             return null;
+        }
+    }
+
+    public static Optional<String> userDefinedFileAttribute(Path target, String attributeName) {
+        if (FileSystem.isDirectory(target)) {
+            return Optional.empty();
+        }
+        try {
+            UserDefinedFileAttributeView view = Files.getFileAttributeView(target, UserDefinedFileAttributeView.class);
+            if (view == null) {
+                return Optional.empty();
+            }
+            if (view.list().contains(attributeName)) {
+                int size = view.size(attributeName);
+                ByteBuffer buffer = ByteBuffer.allocate(size);
+                view.read(attributeName, buffer);
+                buffer.flip();
+                String attr = StandardCharsets.UTF_8.decode(buffer).toString();
+                return Optional.of(attr);
+            }
+            return Optional.empty();
+        } catch (IOException e) {
+            LOG.atDebug().setCause(e)
+                    .addArgument(attributeName)
+                    .addArgument(() -> target.toAbsolutePath().toString())
+                    .log("Can't retrieve user defined attribute <{}> for <{}>");
+            return Optional.empty();
         }
     }
 }

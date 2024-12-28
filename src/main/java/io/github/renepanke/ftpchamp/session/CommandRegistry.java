@@ -17,6 +17,7 @@ public class CommandRegistry {
         put("LIST", new LIST());
         put("MDTM", new MDTM());
         put("MKD", new MKD());
+        put("MLST", new MLST());
         put("MODE", new MODE());
         put("NOOP", new NOOP());
         put("PASS", new PASS());
