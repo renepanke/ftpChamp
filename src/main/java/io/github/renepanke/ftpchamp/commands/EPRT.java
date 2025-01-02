@@ -10,6 +10,7 @@ import java.net.*;
 import java.util.List;
 
 import static io.github.renepanke.ftpchamp.commands.shared.Middleware.arg;
+import static io.github.renepanke.ftpchamp.commands.shared.Middleware.auth;
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
 
 /**
@@ -20,7 +21,7 @@ public class EPRT implements Command {
     private final Command innerCommand;
 
     public EPRT() {
-        innerCommand = arg(((argument, session, socket) -> {
+        innerCommand = auth(arg(((argument, session, socket) -> {
             /*
               Following the space, a delimiter character (<d>) MUST be specified.  The delimiter character MUST be one
               of the ASCII characters in range 33-126 inclusive. The character "|" (ASCII 124) is recommended unless
@@ -93,7 +94,7 @@ public class EPRT implements Command {
             session.setActiveClientDataPort(port);
             session.setConnectionMode(ConnectionMode.ACTIVE);
             Reply.PositiveCompletion.send_200_CommandOkay(session);
-        }));
+        })));
     }
 
     @Override
