@@ -1,11 +1,11 @@
 package io.github.renepanke.ftpchamp.commands;
 
+import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import io.github.renepanke.ftpchamp.commands.shared.Command;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.ftpchamp.fs.FileSystem;
 import io.github.renepanke.ftpchamp.lang.Strings;
 import io.github.renepanke.ftpchamp.session.Session;
-import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +19,9 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.github.renepanke.ftpchamp.commands.shared.Middleware.auth;
+import static io.github.renepanke.ftpchamp.commands.shared.Middleware.data;
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
-import static io.github.renepanke.ftpchamp.commands.shared.Middleware.*;
 
 public class LIST implements Command {
 
@@ -39,9 +40,9 @@ public class LIST implements Command {
                         return;
                     }
                 }
-                case PASSIVE -> {
+                case PASSIVE, EXTENDED_PASSIVE -> {
                     if (session.getPassiveServerSocket() == null || session.getPassiveDataPort() == Session.UNINITIALIZED_PORT) {
-                        LOG.warn("Need to call PASV before calling list when using a passive connection, returning 503 Bad Sequence of Commands.");
+                        LOG.warn("Need to call PASV or EPSV before calling list when using a passive connection, returning 503 Bad Sequence of Commands.");
                         Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
                         return;
                     }
@@ -59,8 +60,7 @@ public class LIST implements Command {
 
             Reply.PositivePreliminary.send_150_FileStatusOkayAboutToOpenDataConnection(session);
             switch (session.getConnectionMode()) {
-                case ACTIVE, PASSIVE -> sendList(argument, session, socket);
-                case EXTENDED_PASSIVE -> Reply.PermanentNegativeCompletion.send_502_CommandNotImplemented(session);
+                case ACTIVE, PASSIVE, EXTENDED_PASSIVE -> sendList(argument, session, socket);
                 default -> Reply.PermanentNegativeCompletion.send_503_BadSequenceOfCommands(session);
             }
         }));

@@ -14,6 +14,7 @@ public class CommandRegistry {
         put("CWD", new CWD());
         put("DELE", new DELE());
         put("EPRT", new EPRT());
+        put("EPSV", new EPSV());
         put("FEAT", new FEAT());
         put("LIST", new LIST());
         put("MDTM", new MDTM());

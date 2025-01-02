@@ -100,6 +100,10 @@ public class Reply {
             session.sendResponse("227 Entering Passive Mode (" + addressString + "," + (port / 256) + "," + (port % 256) + ").");
         }
 
+        public static void send_229_EnteringExtendedPassiveMode(Session session, int port) {
+            session.sendResponse("Entering Extended Passive Mode (|||" + port + "|)");
+        }
+
         public static void send_230_UserLoggedInProceed(Session session) {
             session.sendResponse("230 User logged in, proceed.");
         }

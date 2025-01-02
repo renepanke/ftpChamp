@@ -21,14 +21,13 @@ public final class FileTransferFunctions {
                     throw new FTPServerException(e);
                 }
             }
-            case PASSIVE -> {
+            case EXTENDED_PASSIVE, PASSIVE -> {
                 try {
                     return session.acceptPassiveConnection();
                 } catch (FTPServerException e) {
                     throw new FTPServerException(e);
                 }
             }
-            case EXTENDED_PASSIVE -> throw new FTPServerException("Extended passive mode not implemented for STOR");
             default -> throw new FTPServerException("Unknown connection mode " + session.getConnectionMode());
         }
     }
