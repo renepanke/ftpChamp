@@ -13,6 +13,7 @@ public class CommandRegistry {
         put("CDUP", new CDUP());
         put("CWD", new CWD());
         put("DELE", new DELE());
+        put("EPRT", new EPRT());
         put("FEAT", new FEAT());
         put("LIST", new LIST());
         put("MDTM", new MDTM());
