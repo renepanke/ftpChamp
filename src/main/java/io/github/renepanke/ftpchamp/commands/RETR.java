@@ -32,7 +32,6 @@ public class RETR implements Command {
                     while ((bytesRead = in.read(byteBuffer)) != -1) {
                         out.write(byteBuffer, 0, bytesRead);
                     }
-                    Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
                 }
             } catch (IOException e) {
                 LOG.atError().setCause(e).log("Failed to execute RETR command");

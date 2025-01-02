@@ -10,12 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -53,6 +52,7 @@ public class Session {
     private ServerSocket passiveServerSocket;
     private int passiveDataPort = UNINITIALIZED_PORT;
     private SecurityMechanism securityMechanism = SecurityMechanism.UNINITIALIZED;
+    private DataChannelProtectionLevel dataChannelProtectionLevel = DataChannelProtectionLevel.CLEAR;
 
     public Session(final Socket socket, final RequestHandler sessionRequestHandler) {
         this.id = Hash.getSHA1Length7For(UUID.randomUUID().toString());
@@ -184,11 +184,25 @@ public class Session {
         if (passiveServerSocket != null && not(passiveServerSocket.isClosed())) {
             throw new FTPServerException("Passive server socket already open.");
         }
-        try {
-            passiveServerSocket = new ServerSocket(findAvailablePortInPortRange(), DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
-            passiveDataPort = passiveServerSocket.getLocalPort();
-        } catch (IOException e) {
-            throw new FTPServerException(e);
+        LOG.atDebug().addArgument(this.dataChannelProtectionLevel).log("Opening passive socket with Data Channel Protection Level <{}>");
+        if (DataChannelProtectionLevel.PRIVATE == dataChannelProtectionLevel) {
+            try {
+                SSLServerSocketFactory sslSocketFactory = Configuration.get().getSslContext().getServerSocketFactory();
+                SSLServerSocket sslSocket = (SSLServerSocket) sslSocketFactory.createServerSocket(findAvailablePortInPortRange(), DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
+                this.passiveServerSocket = sslSocket;
+                this.passiveDataPort = sslSocket.getLocalPort();
+                sslSocket.setUseClientMode(false);
+            } catch (IOException e) {
+                LOG.atError().setCause(e).log("Failed to initialize security mechanism");
+                Reply.PermanentNegativeCompletion.send_535_FailedSecurityCheck(this);
+            }
+        } else {
+            try {
+                passiveServerSocket = new ServerSocket(findAvailablePortInPortRange(), DEFAULT_PASSIVE_BACKLOG, DEFAULT_IP);
+                passiveDataPort = passiveServerSocket.getLocalPort();
+            } catch (IOException e) {
+                throw new FTPServerException(e);
+            }
         }
     }
 
@@ -206,6 +220,7 @@ public class Session {
     public void closePassiveSocket() {
         if (passiveServerSocket != null && not(passiveServerSocket.isClosed())) {
             try {
+                Reply.PositiveCompletion.send_226_ClosingDataConnection(this);
                 passiveServerSocket.close();
                 LOG.atInfo().addArgument(() -> passiveServerSocket.getInetAddress().getHostAddress() + ":" + passiveServerSocket.getLocalPort())
                         .log("Closed PASV connection at <{}>");
@@ -285,5 +300,13 @@ public class Session {
 
     public String readLine() throws IOException {
         return this.in.readLine();
+    }
+
+    public DataChannelProtectionLevel getDataChannelProtectionLevel() {
+        return dataChannelProtectionLevel;
+    }
+
+    public void setDataChannelProtectionLevel(DataChannelProtectionLevel dataChannelProtectionLevel) {
+        this.dataChannelProtectionLevel = dataChannelProtectionLevel;
     }
 }

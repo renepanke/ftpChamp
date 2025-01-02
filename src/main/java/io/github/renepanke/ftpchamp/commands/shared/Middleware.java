@@ -1,9 +1,9 @@
 package io.github.renepanke.ftpchamp.commands.shared;
 
+import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerException;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.ftpchamp.lang.Strings;
-import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,7 @@ public class Middleware {
             try (Socket socket = FileTransferFunctions.getConnectionModeMatchingSocket(session)) {
                 command.handle(argument, session, socket);
             } catch (IOException | FTPServerException e) {
+                LOG.error("", e);
                 throw new FTPServerRuntimeException(e);
             } finally {
                 session.closePassiveSocket();

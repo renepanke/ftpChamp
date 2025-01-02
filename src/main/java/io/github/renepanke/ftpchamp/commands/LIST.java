@@ -1,11 +1,11 @@
 package io.github.renepanke.ftpchamp.commands;
 
+import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import io.github.renepanke.ftpchamp.commands.shared.Command;
 import io.github.renepanke.ftpchamp.exceptions.FTPServerRuntimeException;
 import io.github.renepanke.ftpchamp.fs.FileSystem;
 import io.github.renepanke.ftpchamp.lang.Strings;
 import io.github.renepanke.ftpchamp.session.Session;
-import io.github.renepanke.ftpchamp.commands.replies.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +19,9 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.github.renepanke.ftpchamp.commands.shared.Middleware.auth;
+import static io.github.renepanke.ftpchamp.commands.shared.Middleware.data;
 import static io.github.renepanke.ftpchamp.lang.Bools.not;
-import static io.github.renepanke.ftpchamp.commands.shared.Middleware.*;
 
 public class LIST implements Command {
 
@@ -80,20 +81,22 @@ public class LIST implements Command {
     }
 
     private void sendList(String argument, Session session, Socket socket) {
-        try (PrintWriter out = getPrintWriter(socket, session)) {
-            sendListToPrintWriter(argument, session, out);
-            Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
-        }
+        LOG.trace("LIST.sendList()");
+//        try (PrintWriter out = getPrintWriter(socket, session)) {
+//            sendListToPrintWriter(argument, session, out);
+//            Reply.PositiveCompletion.send_226_ClosingDataConnection(session);
+//        }
+        sendListToPrintWriter(argument, session, getPrintWriter(socket, session));
     }
 
     private void sendListToPrintWriter(String argument, Session session, PrintWriter out) {
+        LOG.trace("LIST.sendListToPrintWriter()");
         String list = generateList(argument, session);
         LOG.atTrace().addArgument(() -> list).log("Sending the following list to data socket:\r\n{}");
         out.print(list);
     }
 
     private String generateList(String argument, Session session) {
-        LOG.trace("Entering generateList");
         Path targetDir = session.getWorkingDirectory();
         if (Strings.isNotBlank(argument)) {
             targetDir = targetDir.resolve(argument);
@@ -118,6 +121,10 @@ public class LIST implements Command {
     }
 
     private static PrintWriter getPrintWriter(Socket dataSocket, Session session) {
+        LOG.atTrace().addArgument(dataSocket.getInetAddress().getHostName())
+                .addArgument(dataSocket.getPort())
+                .addArgument(session.getId())
+                .log("LIST.getPrintWrite({},{}:{})");
         try {
             return new PrintWriter(new OutputStreamWriter(dataSocket.getOutputStream(), StandardCharsets.UTF_8), AUTO_FLUSH);
         } catch (IOException e) {

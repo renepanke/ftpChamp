@@ -23,6 +23,7 @@ public class CommandRegistry {
         put("PASS", new PASS());
         put("PASV", new PASV());
         put("PORT", new PORT());
+        put("PROT", new PROT());
         put("PWD", new PWD());
         put("QUIT", new QUIT());
         put("RETR", new RETR());
