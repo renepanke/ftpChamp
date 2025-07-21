@@ -11,7 +11,7 @@
         </encoder>
     </appender>
 
-    <!-- RANDOM -->
+    <!-- RANDOM 2-->
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
